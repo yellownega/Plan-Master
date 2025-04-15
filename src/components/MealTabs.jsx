@@ -7,6 +7,7 @@ function MealTabs({ handleMealClick }) {
     breakfast: [
       {
         name: "Avocado Toast with Eggs",
+        image: "Avocado_Toast_with_Eggs.jpg",
         ingredients: [
           "2 slices whole grain bread",
           "1 ripe avocado",
@@ -18,6 +19,7 @@ function MealTabs({ handleMealClick }) {
       },
       {
         name: "Greek Yogurt Parfait",
+        image: "Greek_Yogurt_Parfait.jpg",
         ingredients: [
           "1 cup Greek yogurt",
           "1/2 cup granola",
@@ -27,6 +29,7 @@ function MealTabs({ handleMealClick }) {
       },
       {
         name: "Oatmeal with Fruits",
+        image: "Oatmeal_with_Fruits.jpg",
         ingredients: [
           "1/2 cup oats",
           "1 cup almond milk",
@@ -34,10 +37,42 @@ function MealTabs({ handleMealClick }) {
           "Chia seeds",
         ],
       },
+      {
+        name: "Peanut Butter Banana Smoothie",
+        image: "Peanut_Butter_Banana_Smoothie.jpg",
+        ingredients: [
+          "1 banana",
+          "2 tbsp peanut butter",
+          "1 cup almond milk",
+          "Ice cubes",
+        ],
+      },
+      {
+        name: "Veggie Omelette",
+        image: "Veggie_Omelette.jpg",
+        ingredients: [
+          "2 eggs",
+          "Spinach",
+          "Bell peppers",
+          "Onions",
+          "Cheddar cheese",
+        ],
+      },
+      {
+        name: "Chia Pudding",
+        image: "Chia_Pudding.jpg",
+        ingredients: [
+          "1/4 cup chia seeds",
+          "1 cup coconut milk",
+          "Maple syrup",
+          "Sliced strawberries",
+        ],
+      },
     ],
     lunch: [
       {
         name: "Grilled Chicken Salad",
+        image: "Grilled_Chicken_Salad.jpg",
         ingredients: [
           "Grilled chicken breast",
           "Mixed greens",
@@ -48,6 +83,7 @@ function MealTabs({ handleMealClick }) {
       },
       {
         name: "Quinoa Bowl",
+        image: "Quinoa_Bowl.jpg",
         ingredients: [
           "1 cup cooked quinoa",
           "Grilled veggies",
@@ -56,19 +92,58 @@ function MealTabs({ handleMealClick }) {
         ],
       },
       {
-        name: "Tuna Sandwich",
+        name: "Mediterranean Tuna Sandwich",
+        image: "Mediterranean_Tuna_Sandwich.jpg",
         ingredients: [
-          "Whole wheat bread",
-          "Canned tuna",
+          "Whole grain bread",
+          "Canned tuna in olive oil",
+          "Baby spinach",
+          "Sliced cherry tomatoes",
+          "Cucumber slices",
+          "Crumbled feta cheese",
+          "Hummus or Greek yogurt spread",
+          "A squeeze of lemon juice",
+          "Salt and pepper to taste",
+        ],
+      },
+      {
+        name: "Chicken Wrap",
+        image: "Chicken_Wrap.jpg",
+        ingredients: [
+          "Grilled chicken strips",
+          "Whole wheat tortilla",
           "Lettuce",
-          "Tomato slices",
-          "Light mayo",
+          "Tomato",
+          "Greek yogurt dressing",
+        ],
+      },
+      {
+        name: "Veggie Burrito Bowl",
+        image: "Veggie_Burrito_Bowl.jpg",
+        ingredients: [
+          "Brown rice",
+          "Black beans",
+          "Corn",
+          "Guacamole",
+          "Salsa",
+        ],
+      },
+      {
+        name: "Lentil Soup",
+        image: "Lentil_Soup.jpg",
+        ingredients: [
+          "Lentils",
+          "Carrots",
+          "Celery",
+          "Onions",
+          "Vegetable broth",
         ],
       },
     ],
     dinner: [
       {
         name: "Baked Salmon with Veggies",
+        image: "Baked_Salmon_with_Veggies.jpg",
         ingredients: [
           "Salmon fillet",
           "Steamed broccoli",
@@ -78,6 +153,7 @@ function MealTabs({ handleMealClick }) {
       },
       {
         name: "Spaghetti with Tomato Sauce",
+        image: "Spaghetti_with_Tomato_Sauce.jpg",
         ingredients: [
           "Spaghetti",
           "Tomato sauce",
@@ -88,6 +164,7 @@ function MealTabs({ handleMealClick }) {
       },
       {
         name: "Vegetable Stir-Fry",
+        image: "Vegetable_Stir_Fry.jpg",
         ingredients: [
           "Mixed vegetables",
           "Soy sauce",
@@ -95,8 +172,42 @@ function MealTabs({ handleMealClick }) {
           "Tofu (optional)",
         ],
       },
+      {
+        name: "Stuffed Bell Peppers",
+        image: "Stuffed_Bell_Peppers.jpg",
+        ingredients: [
+          "Bell peppers",
+          "Ground turkey",
+          "Quinoa",
+          "Tomato sauce",
+          "Onions",
+        ],
+      },
+      {
+        name: "Chicken Curry with Rice",
+        image: "Chicken_Curry_with_Rice.jpg",
+        ingredients: [
+          "Chicken breast",
+          "Curry paste",
+          "Coconut milk",
+          "Basmati rice",
+          "Cilantro",
+        ],
+      },
+      {
+        name: "Zucchini Noodles with Pesto",
+        image: "Zucchini_Noodles_with_Pesto.jpg",
+        ingredients: [
+          "Zucchini noodles",
+          "Homemade pesto",
+          "Cherry tomatoes",
+          "Parmesan cheese",
+        ],
+      },
     ],
   };
+
+
 
   return (
     <Tabs defaultActiveKey="breakfast" className="mb-3">
@@ -111,9 +222,10 @@ function MealTabs({ handleMealClick }) {
               <div key={`${mealType}-${index}`} className="col-md-6 col-lg-4">
                 <div className="card h-100 shadow-sm">
                   <img
-                    src={placeholderImage}
+                    src={`./${meal.image}`}
                     alt={`${mealType} meal ${index + 1}`}
                     className="card-img-top"
+                    style={{ height: "300px", objectFit: "cover" }}
                   />
                   <div className="card-body">
                     <h5 className="card-title">{meal.name}</h5>

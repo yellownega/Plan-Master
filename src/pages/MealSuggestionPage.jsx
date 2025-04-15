@@ -19,7 +19,7 @@ function MealDetailModal({ meal, show, onClose }) {
           <div className="col-md-6 mb-4 mb-md-0">
             <div className="position-relative rounded overflow-hidden">
               <img
-                src={`/placeholder.svg?height=300&width=500`}
+                src={`/placeholder.jpg?height=300&width=500`}
                 alt={`Suggested meal ${meal}`}
                 width={500}
                 height={300}
