@@ -1,6 +1,6 @@
 import { Tabs, Tab } from "react-bootstrap";
 
-function MealTabs({ handleMealClick }) {
+function MealTabs({ handleMealClick, preferences }) {
   const placeholderImage = "./placeholder.jpg?height=300&width=500";
 
   const mealsData = {
@@ -16,6 +16,7 @@ function MealTabs({ handleMealClick }) {
           "Red pepper flakes (optional)",
           "1 tbsp olive oil",
         ],
+        calories: 460,
       },
       {
         name: "Greek Yogurt Parfait",
@@ -26,6 +27,7 @@ function MealTabs({ handleMealClick }) {
           "1/2 cup mixed berries",
           "Honey to taste",
         ],
+        calories: 350,
       },
       {
         name: "Oatmeal with Fruits",
@@ -36,6 +38,7 @@ function MealTabs({ handleMealClick }) {
           "Sliced banana",
           "Chia seeds",
         ],
+        calories: 310,
       },
       {
         name: "Peanut Butter Banana Smoothie",
@@ -46,6 +49,7 @@ function MealTabs({ handleMealClick }) {
           "1 cup almond milk",
           "Ice cubes",
         ],
+        calories: 360,
       },
       {
         name: "Veggie Omelette",
@@ -57,6 +61,7 @@ function MealTabs({ handleMealClick }) {
           "Onions",
           "Cheddar cheese",
         ],
+        calories: 280,
       },
       {
         name: "Chia Pudding",
@@ -67,6 +72,7 @@ function MealTabs({ handleMealClick }) {
           "Maple syrup",
           "Sliced strawberries",
         ],
+        calories: 320,
       },
     ],
     lunch: [
@@ -80,6 +86,7 @@ function MealTabs({ handleMealClick }) {
           "Cucumber",
           "Olive oil & balsamic vinegar",
         ],
+        calories: 400,
       },
       {
         name: "Quinoa Bowl",
@@ -90,6 +97,7 @@ function MealTabs({ handleMealClick }) {
           "Feta cheese",
           "Avocado slices",
         ],
+        calories: 450,
       },
       {
         name: "Mediterranean Tuna Sandwich",
@@ -105,6 +113,7 @@ function MealTabs({ handleMealClick }) {
           "A squeeze of lemon juice",
           "Salt and pepper to taste",
         ],
+        calories: 480,
       },
       {
         name: "Chicken Wrap",
@@ -116,6 +125,7 @@ function MealTabs({ handleMealClick }) {
           "Tomato",
           "Greek yogurt dressing",
         ],
+        calories: 420,
       },
       {
         name: "Veggie Burrito Bowl",
@@ -127,6 +137,7 @@ function MealTabs({ handleMealClick }) {
           "Guacamole",
           "Salsa",
         ],
+        calories: 460,
       },
       {
         name: "Lentil Soup",
@@ -138,6 +149,7 @@ function MealTabs({ handleMealClick }) {
           "Onions",
           "Vegetable broth",
         ],
+        calories: 320,
       },
     ],
     dinner: [
@@ -150,6 +162,7 @@ function MealTabs({ handleMealClick }) {
           "Carrots",
           "Lemon slices",
         ],
+        calories: 500,
       },
       {
         name: "Spaghetti with Tomato Sauce",
@@ -161,6 +174,7 @@ function MealTabs({ handleMealClick }) {
           "Basil",
           "Grated Parmesan",
         ],
+        calories: 430,
       },
       {
         name: "Vegetable Stir-Fry",
@@ -171,6 +185,7 @@ function MealTabs({ handleMealClick }) {
           "Garlic and ginger",
           "Tofu (optional)",
         ],
+        calories: 380,
       },
       {
         name: "Stuffed Bell Peppers",
@@ -182,6 +197,7 @@ function MealTabs({ handleMealClick }) {
           "Tomato sauce",
           "Onions",
         ],
+        calories: 450,
       },
       {
         name: "Chicken Curry with Rice",
@@ -193,6 +209,7 @@ function MealTabs({ handleMealClick }) {
           "Basmati rice",
           "Cilantro",
         ],
+        calories: 550,
       },
       {
         name: "Zucchini Noodles with Pesto",
@@ -203,70 +220,129 @@ function MealTabs({ handleMealClick }) {
           "Cherry tomatoes",
           "Parmesan cheese",
         ],
+        calories: 350,
       },
     ],
   };
+  const filterMeals = (meals) => {
+    console.log("Filtering meals with preferences:", preferences);
+    if (!preferences) return meals;
 
+    return meals.filter((meal) => {
+      // Calorie filtering
+      if (preferences.goal === "lose" && meal.calories > 400) return false;
+      if (preferences.goal === "gain" && meal.calories < 400) return false;
 
+      // Dietary restrictions
+      if (preferences.dietary !== "none") {
+        const restrictedIngredients = {
+          vegetarian: ["chicken", "tuna", "salmon", "turkey"],
+          vegan: [
+            "chicken",
+            "tuna",
+            "salmon",
+            "turkey",
+            "cheese",
+            "yogurt",
+            "egg",
+            "milk",
+          ],
+          "gluten-free": ["bread", "spaghetti", "tortilla"],
+          "dairy-free": ["cheese", "yogurt", "milk", "parmesan"],
+        };
+
+        const blocked = restrictedIngredients[preferences.dietary];
+        if (
+          blocked &&
+          meal.ingredients.some((ingredient) =>
+            blocked.some((b) => ingredient.toLowerCase().includes(b))
+          )
+        ) {
+          return false;
+        }
+      }
+      return true;
+    });
+  };
 
   return (
     <Tabs defaultActiveKey="breakfast" className="mb-3">
-      {Object.entries(mealsData).map(([mealType, meals]) => (
-        <Tab
-          eventKey={mealType}
-          title={mealType.charAt(0).toUpperCase() + mealType.slice(1)}
-          key={mealType}
-        >
-          <div className="row g-4 bg-soft-grey">
-            {meals.map((meal, index) => (
-              <div key={`${mealType}-${index}`} className="col-md-6 col-lg-4">
-                <div className="card h-100 shadow-sm">
-                  <img
-                    src={`./${meal.image}`}
-                    alt={`${mealType} meal ${index + 1}`}
-                    className="card-img-top"
-                    style={{ height: "300px", objectFit: "cover" }}
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title">{meal.name}</h5>
-                    <div className="d-flex align-items-center text-muted small mb-2">
-                      <i className="bi bi-people me-1"></i>
-                      <span>Serves 2</span>
-                      <span className="mx-2">•</span>
-                      <span>20 min</span>
-                    </div>
-                    <p className="card-text text-muted small mb-3">
-                      Delicious and nutritious {mealType} option to fuel your
-                      day.
-                    </p>
-                    <div className="d-flex justify-content-between align-items-center">
-                      <div className="d-flex align-items-center">
-                        <i className="bi bi-hand-thumbs-up text-warning me-1"></i>
-                        <span className="small">{100 + index * 17}</span>
+      {Object.entries(mealsData).map(([mealType, meals]) => {
+        const filteredMeals = filterMeals(meals);
+
+        return (
+          <Tab
+            eventKey={mealType}
+            title={mealType.charAt(0).toUpperCase() + mealType.slice(1)}
+            key={mealType}
+          >
+            <div className="row g-4 bg-soft-grey">
+              {filteredMeals.length > 0 ? (
+                filteredMeals.map((meal, index) => (
+                  <div
+                    key={`${mealType}-${index}`}
+                    className="col-md-6 col-lg-4"
+                  >
+                    <div className="card h-100 shadow-sm">
+                      <img
+                        src={`./${meal.image}`}
+                        alt={`${mealType} meal ${index + 1}`}
+                        className="card-img-top"
+                        style={{ height: "300px", objectFit: "cover" }}
+                      />
+                      <div className="card-body">
+                        <h5 className="card-title">{meal.name}</h5>
+                        <div className="d-flex align-items-center text-muted small mb-2">
+                          <i className="bi bi-people me-1"></i>
+                          <span>Serves 2</span>
+                          <span className="mx-2">•</span>
+                          <span>20 min</span>
+                          <span className="mx-2">•</span>
+                          <span>
+                            {meal.calories}{" "}
+                            <strong>
+                              <span className="text-orange-500">kcal</span>
+                            </strong>
+                          </span>
+                        </div>
+                        <p className="card-text text-muted small mb-3">
+                          Delicious and nutritious {mealType} option to fuel
+                          your day.
+                        </p>
+                        <div className="d-flex justify-content-between align-items-center">
+                          <div className="d-flex align-items-center">
+                            <i className="bi bi-hand-thumbs-up text-warning me-1"></i>
+                            <span className="small">{100 + index * 17}</span>
+                          </div>
+                          <button
+                            className="btn btn-outline-warning btn-sm"
+                            onClick={() =>
+                              handleMealClick({
+                                name: meal.name,
+                                image: placeholderImage
+                                  .replace("300", "500")
+                                  .replace("500", "800"),
+                                ingredients: meal.ingredients,
+                                videoUrl: "#",
+                              })
+                            }
+                          >
+                            View Details
+                          </button>
+                        </div>
                       </div>
-                      <button
-                        className="btn btn-outline-warning btn-sm"
-                        onClick={() =>
-                          handleMealClick({
-                            name: meal.name,
-                            image: placeholderImage
-                              .replace("300", "500")
-                              .replace("500", "800"),
-                            ingredients: meal.ingredients,
-                            videoUrl: "#",
-                          })
-                        }
-                      >
-                        View Details
-                      </button>
                     </div>
                   </div>
+                ))
+              ) : (
+                <div className="col-12 text-center py-5">
+                  <p>No meals match your current filters.</p>
                 </div>
-              </div>
-            ))}
-          </div>
-        </Tab>
-      ))}
+              )}
+            </div>
+          </Tab>
+        );
+      })}
     </Tabs>
   );
 }

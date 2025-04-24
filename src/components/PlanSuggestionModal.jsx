@@ -1,6 +1,23 @@
 import { Modal, Button, Form } from "react-bootstrap";
 
-export default function PlanSuggestionModal({ show, onClose }) {
+export default function PlanSuggestionModal({ show, onClose,onSubmit }) {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+
+    const preferences = {
+      weight: formData.get("weight"),
+      height: formData.get("height"),
+      age: formData.get("age"),
+      goal: formData.get("goal"),
+      budget: formData.get("budget"),
+      dietary: formData.get("dietary"),
+    };
+
+    onSubmit(preferences);
+    onClose();
+  };
+  
   return (
     <Modal show={show} onHide={onClose} centered>
       <Modal.Header closeButton>
@@ -14,7 +31,7 @@ export default function PlanSuggestionModal({ show, onClose }) {
           and budget.
         </p>
 
-        <Form>
+        <Form onSubmit={handleSubmit}>
           <div className="row mb-3">
             <div className="col-6">
               <Form.Group controlId="weight">
@@ -43,12 +60,14 @@ export default function PlanSuggestionModal({ show, onClose }) {
                 id="goal-lose"
                 name="goal"
                 label="Lose weight"
+                value="lose"
               />
               <Form.Check
                 type="radio"
                 id="goal-maintain"
                 name="goal"
                 label="Maintain weight"
+                value="maintain"
                 defaultChecked
               />
               <Form.Check
@@ -56,6 +75,7 @@ export default function PlanSuggestionModal({ show, onClose }) {
                 id="goal-gain"
                 name="goal"
                 label="Gain weight"
+                value="gain"
               />
             </div>
           </Form.Group>
@@ -65,7 +85,13 @@ export default function PlanSuggestionModal({ show, onClose }) {
               <Form.Label>Budget</Form.Label>
               <span className="text-muted small">$150/week</span>
             </div>
-            <Form.Range min="50" max="300" step="10" defaultValue="150" />
+            <Form.Range
+              min="50"
+              max="300"
+              step="10"
+              defaultValue="150"
+              name="budget"
+            />
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="dietary">

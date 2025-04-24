@@ -8,7 +8,8 @@ import MealTabs from "../components/MealTabs";
 
 export default function MealPlanPage() {
   const [showPlanModal, setShowPlanModal] = useState(false);
-  const [selectedMeal, setSelectedMeal] = useState(null);
+  const [ selectedMeal, setSelectedMeal ] = useState(null);
+  const [ userPreferences, setUserPreferences ] = useState(null);
 
   const handleMealClick = (meal) => {
     setSelectedMeal(meal);
@@ -17,6 +18,11 @@ export default function MealPlanPage() {
   const handleCloseModal = () => {
     setSelectedMeal(null);
   };
+  const handlePlanSubmit = (preferences) => {
+    console.log("Received preferences:", preferences);
+    setUserPreferences(preferences);
+  };
+
 
   return (
     <div className="d-flex flex-column min-vh-100 bg-soft-grey">
@@ -53,7 +59,10 @@ export default function MealPlanPage() {
             </button>
           </div>
 
-          <MealTabs handleMealClick={handleMealClick} />
+          <MealTabs
+            handleMealClick={handleMealClick}
+            preferences={userPreferences}
+          />
         </div>
       </main>
 
@@ -78,6 +87,7 @@ export default function MealPlanPage() {
       <PlanSuggestionModal
         show={showPlanModal}
         onClose={() => setShowPlanModal(false)}
+        onSubmit={handlePlanSubmit}
       />
     </div>
   );
