@@ -1,6 +1,7 @@
+// src/components/PlanSuggestionModal.jsx
 import { Modal, Button, Form } from "react-bootstrap";
 
-export default function PlanSuggestionModal({ show, onClose,onSubmit }) {
+export default function PlanSuggestionModal({ show, onClose, onSubmit }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -17,7 +18,7 @@ export default function PlanSuggestionModal({ show, onClose,onSubmit }) {
     onSubmit(preferences);
     onClose();
   };
-  
+
   return (
     <Modal show={show} onHide={onClose} centered>
       <Modal.Header closeButton>
@@ -36,20 +37,20 @@ export default function PlanSuggestionModal({ show, onClose,onSubmit }) {
             <div className="col-6">
               <Form.Group controlId="weight">
                 <Form.Label>Weight (kg)</Form.Label>
-                <Form.Control type="number" placeholder="70" />
+                <Form.Control type="number" placeholder="70" name="weight" />
               </Form.Group>
             </div>
             <div className="col-6">
               <Form.Group controlId="height">
                 <Form.Label>Height (cm)</Form.Label>
-                <Form.Control type="number" placeholder="175" />
+                <Form.Control type="number" placeholder="175" name="height" />
               </Form.Group>
             </div>
           </div>
 
           <Form.Group className="mb-3" controlId="age">
             <Form.Label>Age</Form.Label>
-            <Form.Control type="number" placeholder="30" />
+            <Form.Control type="number" placeholder="30" name="age" />
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -96,7 +97,7 @@ export default function PlanSuggestionModal({ show, onClose,onSubmit }) {
 
           <Form.Group className="mb-3" controlId="dietary">
             <Form.Label>Dietary Restrictions</Form.Label>
-            <Form.Select>
+            <Form.Select name="dietary">
               <option value="none">None</option>
               <option value="vegetarian">Vegetarian</option>
               <option value="vegan">Vegan</option>
@@ -106,7 +107,7 @@ export default function PlanSuggestionModal({ show, onClose,onSubmit }) {
           </Form.Group>
 
           <Button variant="warning" type="submit" className="w-100 mt-3">
-            Generate Meal Plan
+            Submit Preferences
           </Button>
         </Form>
       </Modal.Body>
