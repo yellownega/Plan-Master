@@ -14,6 +14,7 @@ import {
   FaEye,
   FaUndo,
   FaTrash,
+  FaDumbbell,
 } from "react-icons/fa";
 
 export default function MealPlanPage() {
@@ -574,6 +575,11 @@ export default function MealPlanPage() {
                 >
                   <FaTrash className="me-2" /> Clear Preferences
                 </button>
+              </li>
+              <li>
+                <Link to="/gym-hub" className="nav-option" onClick={toggleNav}>
+                  <FaDumbbell className="me-2" /> Gym Plan
+                </Link>
               </li>
             </ul>
           </div>

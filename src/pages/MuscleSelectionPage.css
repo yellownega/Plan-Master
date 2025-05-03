@@ -1,0 +1,353 @@
+/* src/pages/MuscleSelectionPage.css */
+
+/* Define variables globally to avoid scoping issues with :root */
+:root {
+  --primary-color: #db7c34;
+  --primary-hover: #bf692c;
+  --secondary-color: #2c3e50;
+  --text-dark: #333;
+  --text-medium: #555;
+  --text-light: #666;
+  --text-color: #ffffff;
+  /* Added for consistency with HomePage */
+  --bg-light: #f8f9fa;
+  --border-color: #e0e0e0;
+  --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
+/* Base Styles */
+.muscle-selection-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #34495e;
+  /* Dark theme from muscle-selection.css */
+  color: var(--text-color);
+  /* Adjusted for readability */
+}
+
+.muscle-selection-page main {
+  flex: 1;
+}
+
+/* Layout Containers */
+.muscle-selection-page .muscle-selection-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  width: 100%;
+  flex: 1;
+  padding-top: 80px;
+  padding-bottom: 40px;
+}
+
+.muscle-selection-page .muscle-selection-content {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  min-height: 600px;
+}
+
+.muscle-selection-page .muscle-figure-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  padding: 1rem;
+}
+
+.muscle-selection-page .muscle-info {
+  flex: 1;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  overflow-y: auto;
+  max-height: 80vh;
+}
+
+/* Component Styles */
+/* Hero Section */
+.muscle-selection-page .hero-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.muscle-selection-page .hero-section h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+  /* Adjusted for dark background */
+}
+
+.muscle-selection-page .subtitle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.7);
+  /* Adjusted for dark background */
+}
+
+/* View Controls */
+.muscle-selection-page .view-controls {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.muscle-selection-page .view-toggle,
+.muscle-selection-page .category-toggle {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.muscle-selection-page .view-btn,
+.muscle-selection-page .toggle-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+.muscle-selection-page .view-btn.active,
+.muscle-selection-page .toggle-btn.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.muscle-selection-page .view-btn:hover,
+.muscle-selection-page .toggle-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.muscle-selection-page .view-btn.active:hover,
+.muscle-selection-page .toggle-btn.active:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Muscle Figure */
+.muscle-selection-page .muscle-figure {
+  position: relative;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.muscle-selection-page .base-figure {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.muscle-selection-page .muscle-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.muscle-selection-page .muscle-area {
+  position: absolute;
+  cursor: pointer;
+  opacity: 0.2;
+  transition: opacity 0.3s, fill 0.3s, transform 0.3s;
+  transform-origin: center;
+}
+
+.muscle-selection-page .muscle-area:hover {
+  opacity: 0.7;
+  /* Removed !important */
+  transform: scale(1.02);
+}
+
+.muscle-selection-page .muscle-area.selected {
+  opacity: 0.8;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.7));
+}
+
+/* Muscle Details */
+.muscle-selection-page .muscle-details h3 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-dark);
+  text-transform: capitalize;
+}
+
+.muscle-selection-page .muscle-details p {
+  margin-bottom: 1.5rem;
+  color: var(--text-medium);
+}
+
+.muscle-selection-page .muscle-details h4 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: var(--text-dark);
+}
+
+/* Exercise List */
+.muscle-selection-page .exercise-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.muscle-selection-page .exercise-item {
+  border: 1px solid #ffffff;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.muscle-selection-page .exercise-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.muscle-selection-page .exercise-header {
+  padding: 0.8rem 1rem;
+  background-color: var(--primary-color);
+  /* Updated to match HomePage theme */
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  min-height: 44px;
+}
+
+.muscle-selection-page .exercise-header:hover {
+  background-color: var(--primary-hover);
+}
+
+.muscle-selection-page .exercise-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.muscle-selection-page .expand-icon {
+  transition: transform 0.2s ease;
+}
+
+.muscle-selection-page .exercise-item.expanded .expand-icon {
+  transform: rotate(180deg);
+}
+
+.muscle-selection-page .exercise-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.muscle-selection-page .exercise-content.visible {
+  max-height: 1000px;
+  /* Increased to accommodate video content */
+}
+
+.muscle-selection-page .video-container {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+.muscle-selection-page .video-container video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.muscle-selection-page .exercise-description {
+  padding: 15px;
+  background-color: #db7c34;
+  color: var(--text-medium);
+}
+
+/* Scrollbar */
+.muscle-selection-page .muscle-info::-webkit-scrollbar {
+  width: 8px;
+}
+
+.muscle-selection-page .muscle-info::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.muscle-selection-page .muscle-info::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+}
+
+.muscle-selection-page .muscle-info::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-hover);
+}
+
+/* Footer */
+.muscle-selection-page footer {
+  background-color: var(--secondary-color);
+  color: white;
+  padding: 2rem 0;
+  margin-top: auto;
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+  .muscle-selection-page .muscle-selection-content {
+    flex-direction: column;
+  }
+
+  .muscle-selection-page .muscle-figure-container,
+  .muscle-selection-page .muscle-info {
+    max-width: 100%;
+    min-height: auto;
+  }
+
+  .muscle-selection-page .muscle-info {
+    max-height: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .muscle-selection-page .muscle-selection-container {
+    padding: 1rem;
+  }
+
+  .muscle-selection-page .view-toggle,
+  .muscle-selection-page .category-toggle {
+    justify-content: flex-start;
+  }
+
+  .muscle-selection-page .view-btn,
+  .muscle-selection-page .toggle-btn {
+    flex: 1 0 120px;
+  }
+
+  .muscle-selection-page .hero-section h1 {
+    font-size: 2rem;
+  }
+
+  .muscle-selection-page .muscle-figure {
+    margin: 0 auto 20px;
+  }
+
+  .muscle-selection-page .exercise-title {
+    padding: 12px 15px;
+    font-size: 0.95rem;
+  }
+}
