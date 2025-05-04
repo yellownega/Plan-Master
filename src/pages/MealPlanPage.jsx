@@ -1,11 +1,16 @@
 // src/pages/MealPlanPage.jsx
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Modal, Button, Tab, Tabs } from "react-bootstrap";
 import PlanSuggestionModal from "../components/PlanSuggestionModal";
 import MealDetailModal from "../components/MealDetailModal";
 import MealTabs from "../components/MealTabs";
-import { getMealPlan, saveMealPlan } from "../services/api";
+import {
+  getMealPlan,
+  saveMealPlan,
+  getProfile,
+  updateProfile,
+} from "../services/api";
 import {
   FaBars,
   FaUtensils,
@@ -18,16 +23,19 @@ import {
 } from "react-icons/fa";
 
 export default function MealPlanPage() {
-  const userId = "test-user";
-
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token"); // Get token from localStorage
+  const [userId, setUserId] = useState(null); // Will be set from token
   const [showPlanModal, setShowPlanModal] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState(null);
-  const [userPreferences, setUserPreferences] = useState(() => {
-    const savedPreferences = localStorage.getItem("userPreferences");
-    return savedPreferences ? JSON.parse(savedPreferences) : null;
-  });
+  const [userPreferences, setUserPreferences] = useState(null);
+  const [mealPlan, setMealPlan] = useState(null);
+  const [savedMealPlan, setSavedMealPlan] = useState(null);
+  const [showSavedPlans, setShowSavedPlans] = useState(false);
+  const [isNavOpen, setIsNavOpen] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Default meals data with images (same as MealTabs.jsx but with correct image URLs)
+  // Default meals data with images
   const defaultMealsData = {
     breakfast: [
       {
@@ -286,15 +294,41 @@ export default function MealPlanPage() {
     ],
   };
 
-  // Initialize mealPlan with defaultMealsData to display all meals on page load
-  const [mealPlan, setMealPlan] = useState(defaultMealsData);
-  const [savedMealPlan, setSavedMealPlan] = useState(null);
-  const [showSavedPlans, setShowSavedPlans] = useState(false);
-  const [isNavOpen, setIsNavOpen] = useState(false);
-  const [error, setError] = useState(null);
+  useEffect(() => {
+    const fetchUserAndProfile = async () => {
+      console.log("Token from localStorage:", token);
+      if (!token) {
+        console.log("No token found, redirecting to login");
+        navigate("/login");
+        return;
+      }
+      try {
+        const tokenParts = token.split(".");
+        if (tokenParts.length !== 3) {
+          throw new Error("Invalid token format");
+        }
+        const decoded = JSON.parse(atob(tokenParts[1]));
+        console.log("Decoded token:", decoded);
+        if (!decoded.userId) {
+          throw new Error("Token does not contain userId");
+        }
+        setUserId(decoded.userId);
+        const profile = await getProfile(token);
+        console.log("Profile data:", profile);
+        setUserPreferences(profile.preferences || null);
+      } catch (err) {
+        console.error("Error in fetchUserAndProfile:", err.message);
+        setError("Failed to authenticate or fetch profile: " + err.message);
+        localStorage.removeItem("token"); // Clear invalid token
+        navigate("/login");
+      }
+    };
+    fetchUserAndProfile();
+  }, [token, navigate]);
 
   useEffect(() => {
     const fetchMealPlan = async () => {
+      if (!userId) return;
       try {
         const data = await getMealPlan(userId);
         setSavedMealPlan(data);
@@ -318,12 +352,21 @@ export default function MealPlanPage() {
     setSelectedMeal(null);
   };
 
-  const handlePlanSubmit = (preferences) => {
+  const handlePlanSubmit = async (preferences) => {
     console.log("Received preferences:", preferences);
-    setUserPreferences(preferences);
-    localStorage.setItem("userPreferences", JSON.stringify(preferences));
-    setMealPlan(null); // Clear meal plan to show all default meals unfiltered
-    setShowSavedPlans(false); // Reset saved plans view
+    if (!token) {
+      setError("Please log in to save preferences");
+      return;
+    }
+    try {
+      const updatedUser = await updateProfile(token, preferences);
+      setUserPreferences(updatedUser.preferences);
+      setMealPlan(null); // Clear meal plan to show all default meals unfiltered
+      setShowSavedPlans(false);
+      setError(null);
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to save preferences");
+    }
   };
 
   const handleGenerateMealPlan = () => {
@@ -398,11 +441,12 @@ export default function MealPlanPage() {
   };
 
   const handleSaveMealPlan = async () => {
-    if (!mealPlan) {
-      alert("Please generate a meal plan first using Generate Meal Plan.");
+    if (!mealPlan || !userId) {
+      alert(
+        "Please generate a meal plan first using Generate Meal Plan or log in."
+      );
       return;
     }
-
     try {
       const planToSave = {
         userId,
@@ -438,7 +482,7 @@ export default function MealPlanPage() {
   };
 
   const handleResetToDefault = () => {
-    setMealPlan(defaultMealsData); // Reset to all meals
+    setMealPlan(defaultMealsData);
     setShowSavedPlans(false);
   };
 
@@ -468,7 +512,11 @@ export default function MealPlanPage() {
             <Link to="/profile" className="me-3 text-decoration-none">
               Profile
             </Link>
-            <Link to="/" className="text-warning text-decoration-none">
+            <Link
+              to="/"
+              className="text-warning text-decoration-none"
+              onClick={() => localStorage.removeItem("token")}
+            >
               Logout
             </Link>
           </nav>
@@ -568,8 +616,9 @@ export default function MealPlanPage() {
                   className="nav-option"
                   onClick={() => {
                     setUserPreferences(null);
-                    localStorage.removeItem("userPreferences");
-                    setMealPlan(defaultMealsData); // Reset to all meals
+                    if (token)
+                      updateProfile(token, { goal: null, dietary: "none" });
+                    setMealPlan(defaultMealsData);
                     toggleNav();
                   }}
                 >
@@ -587,7 +636,7 @@ export default function MealPlanPage() {
           <MealTabs
             handleMealClick={handleMealClick}
             preferences={userPreferences}
-            mealPlan={mealPlan}
+            mealPlan={mealPlan || defaultMealsData} // Show default meals if no plan
           />
         </div>
       </main>
