@@ -1,6 +1,7 @@
+// src/pages/LoginPage.jsx
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios"; // Import axios
+import axios from "axios";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -59,6 +60,11 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
+      console.log(
+        "Sending login request to:",
+        "http://localhost:5000/api/auth/login",
+        formData
+      );
       const response = await axios.post(
         "http://localhost:5000/api/auth/login",
         {
@@ -66,23 +72,31 @@ export default function LoginPage() {
           password: formData.password,
         }
       );
+      console.log("Login response:", response.data);
 
-      // Store token in localStorage (or sessionStorage if rememberMe is false)
       const token = response.data.token;
-      if (formData.rememberMe) {
-        localStorage.setItem("token", token);
-      } else {
-        sessionStorage.setItem("token", token);
+      if (!token) {
+        throw new Error("No token received from server");
       }
+
+      localStorage.setItem("token", token);
+      console.log("Token saved to localStorage:", token);
 
       setIsLoading(false);
       navigate("/dashboard");
     } catch (error) {
+      console.error(
+        "Login error:",
+        error.response?.data || error.message,
+        error.response?.status
+      );
       setIsLoading(false);
       setFormErrors({
         ...formErrors,
         general:
-          error.response?.data?.error || "An error occurred during login",
+          error.response?.status === 404
+            ? "Server could not find the login endpoint. Please ensure the backend is running and configured correctly."
+            : error.response?.data?.error || "An error occurred during login",
       });
     }
   };

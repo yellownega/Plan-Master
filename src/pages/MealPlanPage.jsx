@@ -309,10 +309,10 @@ export default function MealPlanPage() {
         }
         const decoded = JSON.parse(atob(tokenParts[1]));
         console.log("Decoded token:", decoded);
-        if (!decoded.userId) {
+        if (!decoded._id && !decoded.userId) {
           throw new Error("Token does not contain userId");
         }
-        setUserId(decoded.userId);
+        setUserId(decoded._id || decoded.userId);
         const profile = await getProfile(token);
         console.log("Profile data:", profile);
         setUserPreferences(profile.preferences || null);
@@ -332,13 +332,21 @@ export default function MealPlanPage() {
       try {
         const data = await getMealPlan(userId);
         setSavedMealPlan(data);
+        setMealPlan(data); // Initialize mealPlan with fetched data
         setError(null);
       } catch (error) {
-        console.error("Error fetching meal plan:", error);
-        setSavedMealPlan({ breakfast: [], lunch: [], dinner: [] });
-        setError(
-          "Failed to fetch meal plan. Please ensure the backend server is running."
-        );
+        // If the error is a 404 (meal plan not found), treat it as a non-error case
+        if (error.response?.status === 404) {
+          console.log("No meal plan found for user, initializing empty plan");
+          setSavedMealPlan(defaultMealsData);
+          setMealPlan(defaultMealsData);
+        } else {
+          // Log other errors (e.g., 500 server error)
+          console.error("Error fetching meal plan:", error.message);
+          setSavedMealPlan(defaultMealsData);
+          setMealPlan(defaultMealsData);
+          setError(error.message || "Failed to fetch meal plan.");
+        }
       }
     };
     fetchMealPlan();

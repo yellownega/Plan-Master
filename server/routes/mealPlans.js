@@ -1,32 +1,43 @@
-// server/routes/mealPlans.js
+// server/routes/mealplans.js
 const express = require('express');
 const router = express.Router();
 const MealPlan = require('../models/MealPlan');
-console.log('MealPlan model:', MealPlan); // Add this to debug
 
-// Get meal plan by userId
+// Get meal plan for a user
 router.get('/:userId', async (req, res) => {
     try {
-        const mealPlan = await MealPlan.findOne({
-            userId: req.params.userId,
-        });
-        res.json(mealPlan || {});
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+        const userId = req.params.userId;
+        const mealPlan = await MealPlan.findOne({ userId });
+        if (!mealPlan) {
+            return res.status(404).json({ error: 'Meal plan not found' });
+        }
+        res.json(mealPlan);
+    } catch (error) {
+        console.error('Error fetching meal plan:', error);
+        res.status(500).json({ error: error.message });
     }
 });
 
-// Create or update meal plan
+// Save meal plan for a user
 router.post('/', async (req, res) => {
     try {
-        const mealPlan = await MealPlan.findOneAndUpdate(
-            { userId: req.body.userId },
-            req.body,
-            { upsert: true, new: true }
-        );
+        const { userId, breakfast, lunch, dinner } = req.body;
+        let mealPlan = await MealPlan.findOne({ userId });
+        if (mealPlan) {
+            // Update existing meal plan
+            mealPlan.breakfast = breakfast || [];
+            mealPlan.lunch = lunch || [];
+            mealPlan.dinner = dinner || [];
+            await mealPlan.save();
+        } else {
+            // Create new meal plan
+            mealPlan = new MealPlan({ userId, breakfast: breakfast || [], lunch: lunch || [], dinner: dinner || [] });
+            await mealPlan.save();
+        }
         res.json(mealPlan);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+    } catch (error) {
+        console.error('Error saving meal plan:', error);
+        res.status(500).json({ error: error.message });
     }
 });
 
