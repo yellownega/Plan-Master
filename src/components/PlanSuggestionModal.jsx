@@ -7,15 +7,23 @@ export default function PlanSuggestionModal({ show, onClose, onSubmit }) {
     const formData = new FormData(e.target);
 
     const preferences = {
-      weight: formData.get("weight"),
-      height: formData.get("height"),
-      age: formData.get("age"),
-      goal: formData.get("goal"),
-      budget: formData.get("budget"),
-      dietary: formData.get("dietary"),
+      dietaryRestrictions: [formData.get("dietary") || "none"], // Ensure array
+      goals: [formData.get("goal") || "maintain"], // Ensure array
+      cuisinePreferences: [], // Placeholder
+      weight: formData.get("weight") ? parseInt(formData.get("weight")) : null,
+      height: formData.get("height") ? parseInt(formData.get("height")) : null,
+      age: formData.get("age") ? parseInt(formData.get("age")) : null,
+      budget: formData.get("budget") ? parseInt(formData.get("budget")) : null,
     };
 
-    onSubmit(preferences);
+    // Send only the preferences expected by the backend
+    const backendPreferences = {
+      dietaryRestrictions: preferences.dietaryRestrictions,
+      goals: preferences.goals,
+      cuisinePreferences: preferences.cuisinePreferences,
+    };
+
+    onSubmit(backendPreferences);
     onClose();
   };
 
@@ -31,7 +39,6 @@ export default function PlanSuggestionModal({ show, onClose, onSubmit }) {
           Enter your details to get a customized meal plan that fits your goals
           and budget.
         </p>
-
         <Form onSubmit={handleSubmit}>
           <div className="row mb-3">
             <div className="col-6">
@@ -47,12 +54,10 @@ export default function PlanSuggestionModal({ show, onClose, onSubmit }) {
               </Form.Group>
             </div>
           </div>
-
           <Form.Group className="mb-3" controlId="age">
             <Form.Label>Age</Form.Label>
             <Form.Control type="number" placeholder="30" name="age" />
           </Form.Group>
-
           <Form.Group className="mb-3">
             <Form.Label>Goal</Form.Label>
             <div>
@@ -80,7 +85,6 @@ export default function PlanSuggestionModal({ show, onClose, onSubmit }) {
               />
             </div>
           </Form.Group>
-
           <Form.Group className="mb-3" controlId="budget">
             <div className="d-flex justify-content-between">
               <Form.Label>Budget</Form.Label>
@@ -94,7 +98,6 @@ export default function PlanSuggestionModal({ show, onClose, onSubmit }) {
               name="budget"
             />
           </Form.Group>
-
           <Form.Group className="mb-3" controlId="dietary">
             <Form.Label>Dietary Restrictions</Form.Label>
             <Form.Select name="dietary">
@@ -105,7 +108,6 @@ export default function PlanSuggestionModal({ show, onClose, onSubmit }) {
               <option value="dairy-free">Dairy-free</option>
             </Form.Select>
           </Form.Group>
-
           <Button variant="warning" type="submit" className="w-100 mt-3">
             Submit Preferences
           </Button>

@@ -309,17 +309,24 @@ export default function MealPlanPage() {
         }
         const decoded = JSON.parse(atob(tokenParts[1]));
         console.log("Decoded token:", decoded);
-        if (!decoded._id && !decoded.userId) {
-          throw new Error("Token does not contain userId");
+        const userIdField = decoded._id || decoded.userId || decoded.sub;
+        if (!userIdField) {
+          throw new Error("Token does not contain a user ID");
         }
-        setUserId(decoded._id || decoded.userId);
-        const profile = await getProfile(token);
+        setUserId(userIdField);
+        const profile = await getProfile();
         console.log("Profile data:", profile);
-        setUserPreferences(profile.preferences || null);
+        setUserPreferences(
+          profile.preferences || {
+            dietaryRestrictions: [],
+            goals: [],
+            cuisinePreferences: [],
+          }
+        );
       } catch (err) {
         console.error("Error in fetchUserAndProfile:", err.message);
         setError("Failed to authenticate or fetch profile: " + err.message);
-        localStorage.removeItem("token"); // Clear invalid token
+        localStorage.removeItem("token");
         navigate("/login");
       }
     };
@@ -332,16 +339,14 @@ export default function MealPlanPage() {
       try {
         const data = await getMealPlan(userId);
         setSavedMealPlan(data);
-        setMealPlan(data); // Initialize mealPlan with fetched data
+        setMealPlan(data);
         setError(null);
       } catch (error) {
-        // If the error is a 404 (meal plan not found), treat it as a non-error case
         if (error.response?.status === 404) {
           console.log("No meal plan found for user, initializing empty plan");
           setSavedMealPlan(defaultMealsData);
           setMealPlan(defaultMealsData);
         } else {
-          // Log other errors (e.g., 500 server error)
           console.error("Error fetching meal plan:", error.message);
           setSavedMealPlan(defaultMealsData);
           setMealPlan(defaultMealsData);
@@ -361,40 +366,47 @@ export default function MealPlanPage() {
   };
 
   const handlePlanSubmit = async (preferences) => {
-    console.log("Received preferences:", preferences);
-    if (!token) {
-      setError("Please log in to save preferences");
-      return;
-    }
     try {
-      const updatedUser = await updateProfile(token, preferences);
-      setUserPreferences(updatedUser.preferences);
-      setMealPlan(null); // Clear meal plan to show all default meals unfiltered
-      setShowSavedPlans(false);
+      if (
+        !preferences ||
+        typeof preferences !== "object" ||
+        Object.keys(preferences).length === 0
+      ) {
+        throw new Error("Invalid preferences data");
+      }
+      const updatedProfile = await updateProfile(preferences);
+      setUserPreferences(updatedProfile.preferences);
       setError(null);
-    } catch (err) {
-      setError(err.response?.data?.error || "Failed to save preferences");
+    } catch (error) {
+      console.error(
+        "Failed to update preferences:",
+        error.response?.data?.error || error.message
+      );
+      setError(
+        `Failed to update preferences: ${
+          error.response?.data?.error || error.message
+        }`
+      );
     }
   };
 
   const handleGenerateMealPlan = () => {
-    if (!userPreferences) {
+    if (!userPreferences || !userPreferences.goals?.length) {
       alert("Please submit your preferences using Plan Suggestion first.");
       return;
     }
 
     const filterMeals = (meals) => {
-      if (!userPreferences) return meals;
-
       return meals.filter((meal) => {
         if (!meal || !meal.name) return false;
 
-        if (userPreferences.goal === "lose" && meal.calories > 400)
-          return false;
-        if (userPreferences.goal === "gain" && meal.calories < 400)
-          return false;
+        // Check goals (use the first goal for now)
+        const goal = userPreferences.goals[0];
+        if (goal === "lose" && meal.calories > 400) return false;
+        if (goal === "gain" && meal.calories < 400) return false;
 
-        if (userPreferences.dietary !== "none") {
+        // Check dietary restrictions
+        if (userPreferences.dietaryRestrictions?.length) {
           const restrictedIngredients = {
             vegetarian: ["chicken", "tuna", "salmon", "turkey"],
             vegan: [
@@ -411,15 +423,16 @@ export default function MealPlanPage() {
             "dairy-free": ["cheese", "yogurt", "milk", "parmesan"],
           };
 
-          const blocked = restrictedIngredients[userPreferences.dietary];
-          if (
-            blocked &&
-            meal.ingredients.some((ingredient) =>
-              blocked.some((b) => ingredient.toLowerCase().includes(b))
-            )
-          ) {
-            return false;
-          }
+          const restrictions = userPreferences.dietaryRestrictions;
+          return !restrictions.some((restriction) => {
+            const blocked = restrictedIngredients[restriction];
+            return (
+              blocked &&
+              meal.ingredients.some((ingredient) =>
+                blocked.some((b) => ingredient.toLowerCase().includes(b))
+              )
+            );
+          });
         }
         return true;
       });
@@ -443,7 +456,6 @@ export default function MealPlanPage() {
       lunch: filteredLunch,
       dinner: filteredDinner,
     };
-
     setMealPlan(generatedPlan);
     setShowSavedPlans(false);
   };
@@ -453,6 +465,13 @@ export default function MealPlanPage() {
       alert(
         "Please generate a meal plan first using Generate Meal Plan or log in."
       );
+      return;
+    }
+    if (
+      JSON.stringify(mealPlan) === JSON.stringify(savedMealPlan) &&
+      savedMealPlan
+    ) {
+      alert("No changes to save.");
       return;
     }
     try {
@@ -494,6 +513,30 @@ export default function MealPlanPage() {
     setShowSavedPlans(false);
   };
 
+  const handleClearPreferences = async () => {
+    try {
+      const clearedPreferences = {
+        dietaryRestrictions: [],
+        goals: [],
+        cuisinePreferences: [],
+      };
+      const updatedProfile = await updateProfile(clearedPreferences);
+      setUserPreferences(updatedProfile.preferences);
+      setMealPlan(defaultMealsData);
+      setError(null);
+    } catch (error) {
+      console.error(
+        "Failed to clear preferences:",
+        error.response?.data?.error || error.message
+      );
+      setError(
+        `Failed to clear preferences: ${
+          error.response?.data?.error || error.message
+        }`
+      );
+    }
+  };
+
   const toggleNav = () => {
     setIsNavOpen(!isNavOpen);
   };
@@ -505,6 +548,7 @@ export default function MealPlanPage() {
           className="nav-overlay"
           onClick={toggleNav}
           aria-hidden="true"
+          role="presentation"
         ></div>
       )}
 
@@ -546,6 +590,7 @@ export default function MealPlanPage() {
               <FaBars
                 className="text-warning fs-3 cursor-pointer"
                 onClick={toggleNav}
+                aria-label="Toggle navigation menu"
               />
             </div>
           </div>
@@ -623,10 +668,7 @@ export default function MealPlanPage() {
                 <button
                   className="nav-option"
                   onClick={() => {
-                    setUserPreferences(null);
-                    if (token)
-                      updateProfile(token, { goal: null, dietary: "none" });
-                    setMealPlan(defaultMealsData);
+                    handleClearPreferences();
                     toggleNav();
                   }}
                 >
@@ -644,7 +686,7 @@ export default function MealPlanPage() {
           <MealTabs
             handleMealClick={handleMealClick}
             preferences={userPreferences}
-            mealPlan={mealPlan || defaultMealsData} // Show default meals if no plan
+            mealPlan={mealPlan || defaultMealsData}
           />
         </div>
       </main>

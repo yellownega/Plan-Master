@@ -15,6 +15,7 @@ import MealPlanPage from "./pages/MealPlanPage";
 import MealSuggestionPage from "./pages/MealSuggestionPage";
 import GuestMealSuggestion from "./pages/GuestMealSuggestion";
 import GuestMealPlan from "./pages/GuestMealPlan";
+import Profile from "./pages/ProfilePage"; // Import the Profile page component
 
 // Import pages from GYM-HUB-REACT
 import HomePage from "./pages/HomePage";
@@ -44,6 +45,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             path="/gym-hub/muscle-selection"
             element={<MuscleSelectionPage />}
           />
+          <Route path="/profile" element={<Profile />} />{" "}
+          {/* Add the Profile route */}
           <Route
             path="*"
             element={<div>404: Page Not Found - Check the URL</div>}

@@ -1,0 +1,59 @@
+/* src/pages/ProfilePage.css */
+.bg-gradient {
+    min-height: 100vh;
+}
+
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.animate__animated.animate__fadeIn {
+    animation-duration: 1s;
+}
+
+.rounded-circle {
+    border-radius: 50% !important;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.nav-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.btn-warning:hover {
+    background-color: #ffca2c;
+    border-color: #ffca2c;
+}
+
+.btn-outline-warning {
+    color: #ff6a07;
+    border-color: #ffc107;
+}
+
+.btn-outline-warning:hover {
+    background-color: #ff9807;
+    color: #fff;
+}
+
+.text-warning {
+    color: #ff7f07 !important;
+}

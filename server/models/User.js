@@ -8,8 +8,10 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     preferences: {
-        goal: { type: String, enum: [ 'lose', 'maintain', 'gain' ], default: null }, // Weight goal
-        dietary: { type: String, enum: [ 'none', 'vegetarian', 'vegan', 'gluten-free', 'dairy-free' ], default: 'none' }, // Dietary restrictions
+        dietaryRestrictions: { type: [ String ], default: [] }, // e.g., ["vegan", "gluten-free"]
+        goals: { type: [ String ], default: [] },              // e.g., ["weight-loss", "muscle-gain"]
+        cuisinePreferences: { type: [ String ], default: [] },
+        photo: { type: String, default: '' },        // e.g., ["italian", "mexican"]
     },
 });
 
